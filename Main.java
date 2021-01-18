@@ -17,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.SwingWorker;
 
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
@@ -92,22 +93,10 @@ public class Main extends JFrame implements ActionListener {
 		}
 		
 		GlobalScreen.addNativeKeyListener(new KeyListener());
-		
-		while (true) {
 			
 			//System.out.println("The interval field text is: " + intervalFld.getText());
 			//System.out.println(KeyListener.getActiveKey());
-			
-			if (KeyListener.getActiveKey() == KeyListener.getHotkeyBinding("start")) {
-				
-				new Main().startProgram();
-			}
-			
-			if (KeyListener.getActiveKey() == KeyListener.getHotkeyBinding("stop")) {
-				
-				new Main().stopProgram();
-			}
-		} 
+		
 	}
 
 	
@@ -116,7 +105,7 @@ public class Main extends JFrame implements ActionListener {
 		
 		// Set the frame's attributes
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setTitle("Austin's Auto Clicker");
+		frame.setTitle("Auto Clicker");
 		frame.setVisible(true);
 		frame.setSize(400,220);
 		frame.setLocation(500, 300);
@@ -167,8 +156,8 @@ public class Main extends JFrame implements ActionListener {
 		intervalPanel.add(intervalLbl);
 		intervalPanel.add(intervalFld);
 		
-		repPanel.add(continuousLbl);
 		repPanel.add(continuousBox);
+		repPanel.add(continuousLbl);
 		repPanel.add(repetitionLbl);
 		repPanel.add(repetitionFld);
 		
@@ -198,16 +187,7 @@ public class Main extends JFrame implements ActionListener {
 		
 		if (event.getActionCommand() == "start") {
 			System.out.println("start event called");
-			
-			// Start the program, may receive an AWT Exception
-			try {
-				
-				startProgram();
-			} catch (AWTException e) {
-				
-				// Print the exception
-				e.printStackTrace();
-			}
+			callStart();
 		}
 		
 		if (event.getActionCommand() == "stop") {
@@ -223,7 +203,7 @@ public class Main extends JFrame implements ActionListener {
 		
 	}
 	
-	public int intervalTime() {
+	public static int intervalTime() {
 		
 		// Set the newInterval int to 0 by default
 		int newInterval = 0;
@@ -233,7 +213,7 @@ public class Main extends JFrame implements ActionListener {
 			
 			// Set the newInterval to the users entered value
 			newInterval = Integer.parseInt(intervalFld.getText());
-			//System.out.println("The try statement grabs the value of newInterval at " + newInterval);
+			System.out.println("The try statement grabs the value of newInterval at " + newInterval);
 			
 			// If it's accepted so far, remove any message that may be present
 			notificationLbl.setText("");
@@ -241,8 +221,8 @@ public class Main extends JFrame implements ActionListener {
 		} catch (Exception e) {
 
 			// If an exception is thrown, send the user this message
-			notificationLbl.setText("Please enter numbers in the interval field! Ex: '12'");
-			//System.out.println("Exception in the intervalTime() " + e);
+			notificationLbl.setText("Please enter a number in the interval field");
+			System.out.println("Exception in the intervalTime() " + e);
 			return 0;
 		}
 		
@@ -257,96 +237,9 @@ public class Main extends JFrame implements ActionListener {
 		return newInterval;
 	}
 	
-	// Start the program with the entered information
-	public void startProgram() throws AWTException {
-		System.out.println("startProgram() called");
+	public static void stopProgram() {
 		
-		// Get the interval time
-		int newInterval = intervalTime();
-		
-		//System.out.println(newInterval);
-		//System.out.println(intervalFld.getText());
-		
-		// If the interval time is greater than 0
-		if (newInterval > 0) {
-			//System.out.println("interval is > 0");
-			
-			// Create the clicking robot
-			Robot bot = new Robot();
-			
-			// Set the button to be repeated
-			int click = InputEvent.BUTTON3_DOWN_MASK;
-			
-			if (!(isContinuous())) {
-				
-				try {
-					
-					repetitions = Integer.parseInt(repetitionFld.getText());
-					
-					// Clear the notifications
-					notificationLbl.setText("");
-					
-					// Reset the active key so there isn't a continuous loop
-					KeyListener.setActiveKey("");
-					
-					//System.out.println("The repetitions from repetitionFld.getText() is" + repetitions);
-					
-					// Disable the objects so the user doesn't make changes while running
-					disableObjects();
-					
-					// Loop through the repetitions until the number is met
-					for (int i = 0; i < repetitions; i++) {
-						System.out.println("Clicked");
-						bot.mousePress(click);
-						bot.mouseRelease(click);
-						bot.delay(newInterval);
-						if (KeyListener.getActiveKey() == KeyListener.getHotkeyBinding("stop"))
-							break;
-					}
-					
-					// Reset the active key so there isn't a continuous loop
-					KeyListener.setActiveKey("");
-					
-					// Enable the objects after finishing
-					enableObjects();
-						
-				} catch (Exception e) {
-					
-					// Inform the user that they must enter a number in the repetition field if they want to run the cycle only a number of times
-					notificationLbl.setText("Please enter a number in the repetition field");
-					System.out.println(e.getMessage());
-				}
-				
-			}
-			
-			if (isContinuous()) {
-				
-				// Reset the active key so there isn't a continuous loop
-				KeyListener.setActiveKey("");
-				
-				// Limit the maximum times the application will run continuously
-				int maxReps = 999999;
-				
-				// Continuously loop through the actions 
-				for (int i = 0; i < maxReps; i++) {
-					//System.out.println("Clicked | The value of i in the for loop is: " + i);
-					bot.mousePress(click);
-					bot.mouseRelease(click);
-					bot.delay(newInterval);
-					if (KeyListener.getActiveKey() == KeyListener.getHotkeyBinding("stop")) {
-						break;
-					}
-				}
-				
-				//System.out.println("startProgram -> if isContinuousDone -> for loop -> done with the for loop");
-			
-				// Enable the objects once the loop finishes
-				enableObjects();
-			}
-		}
-	}
-	
-	public void stopProgram() {
+		StartProgram.shutdown = true;
 		
 		// Enable objects once the program stops
 		enableObjects();
@@ -359,15 +252,38 @@ public class Main extends JFrame implements ActionListener {
 		milisecondsRBtn.setEnabled(true);
 		intervalLbl.setEnabled(true);
 		intervalFld.setEnabled(true);
+		continuousBox.setEnabled(true);
+		if (isContinuous()) {
+			
+			continuousLbl.setEnabled(true);
+		}
+		
+		else if (!isContinuous()) {
+			
+			repetitionLbl.setEnabled(true);
+			repetitionFld.setEnabled(true);
+		}
 	}
 	
 	// Disables objects while the program is running
 	public static void disableObjects() {
+		System.out.println("disableObjects() was just called in iteself");
 		startBtn.setEnabled(false);
 		secondsRBtn.setEnabled(false);
 		milisecondsRBtn.setEnabled(false);
-		intervalLbl.setEnabled(true);
-		intervalFld.setEnabled(true);
+		intervalLbl.setEnabled(false);
+		intervalFld.setEnabled(false);
+		continuousBox.setEnabled(false);
+		if (isContinuous()) {
+			
+			continuousLbl.setEnabled(false);
+		}
+		
+		else if (!isContinuous()) {
+			
+			repetitionLbl.setEnabled(false);
+			repetitionFld.setEnabled(false);
+		}
 	}
 	
 	public static Boolean isContinuous() {
@@ -397,5 +313,12 @@ public class Main extends JFrame implements ActionListener {
 			continuousLbl.setText("Continuous | Off");
 			
 		}
+		
+	}
+	
+	public static void callStart() {
+		
+		StartProgram.shutdown = false;
+		(new Thread(new StartProgram())).start();
 	}
 }

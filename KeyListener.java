@@ -4,7 +4,8 @@ import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
 public class KeyListener implements NativeKeyListener {
-
+	
+	
 	// hotkeyAction = Start
 	// hotkeyBinding = F9
 	// hotkeyAction is the button that performs and action in the main script
@@ -20,15 +21,16 @@ public class KeyListener implements NativeKeyListener {
 	@Override
 	public void nativeKeyPressed(NativeKeyEvent e) {
 		// Generic message showing the action performed
-		//System.out.println("Key Pressed: " + NativeKeyEvent.getKeyText(e.getKeyCode()));
+		System.out.println("Key Pressed: " + NativeKeyEvent.getKeyText(e.getKeyCode()));
+		
+		checkCommand(NativeKeyEvent.getKeyText(e.getKeyCode()));
+		activeKey = NativeKeyEvent.getKeyText(e.getKeyCode());
 	}
 
 	@Override
 	public void nativeKeyReleased(NativeKeyEvent e) {
 		// Generic message showing the action performed
 		//System.out.println("Key Released: " + NativeKeyEvent.getKeyText(e.getKeyCode()));
-		
-		activeKey = NativeKeyEvent.getKeyText(e.getKeyCode());
 		
 	}
 
@@ -90,5 +92,34 @@ public class KeyListener implements NativeKeyListener {
 	public static void setActiveKey(String key) {
 		
 		activeKey = key;
+	}
+	
+	public static String getResetActiveKey() {
+		
+		System.out.println("getResetActiveKey() was just called, activeKey is now: " + activeKey);
+		
+		String key = activeKey;
+		System.out.println("activeKey was just set to: " + activeKey);
+		
+		if (key == start) {
+			activeKey = "";
+			return start;
+		}
+		
+		if (key == stop) {
+			activeKey = "";
+			return stop;
+		}
+		
+		return activeKey;
+	}
+	
+	public static void checkCommand(String cmd) {
+			if (cmd == KeyListener.getHotkeyBinding("start"))
+				Main.callStart();
+			
+			if (cmd == KeyListener.getHotkeyBinding("stop"))
+				Main.stopProgram();
+		
 	}
 }
