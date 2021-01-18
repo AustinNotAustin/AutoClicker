@@ -1,3 +1,4 @@
+// Version 1.1
 package me.AustinNotAustin.AustinsAutoClicker;
 
 import java.awt.AWTException;
@@ -313,7 +314,7 @@ public class Main extends JFrame implements ActionListener {
 					
 					// Inform the user that they must enter a number in the repetition field if they want to run the cycle only a number of times
 					notificationLbl.setText("Please enter a number in the repetition field");
-					//System.out.println(e.getMessage());
+					System.out.println(e.getMessage());
 				}
 				
 			}
@@ -356,9 +357,8 @@ public class Main extends JFrame implements ActionListener {
 		startBtn.setEnabled(true);
 		secondsRBtn.setEnabled(true);
 		milisecondsRBtn.setEnabled(true);
+		intervalLbl.setEnabled(true);
 		intervalFld.setEnabled(true);
-		repetitionLbl.setEnabled(true);
-		repetitionFld.setEnabled(true);
 	}
 	
 	// Disables objects while the program is running
@@ -366,9 +366,8 @@ public class Main extends JFrame implements ActionListener {
 		startBtn.setEnabled(false);
 		secondsRBtn.setEnabled(false);
 		milisecondsRBtn.setEnabled(false);
-		intervalFld.setEnabled(false);
-		repetitionLbl.setEnabled(false);
-		repetitionFld.setEnabled(false);
+		intervalLbl.setEnabled(true);
+		intervalFld.setEnabled(true);
 	}
 	
 	public static Boolean isContinuous() {
