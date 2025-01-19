@@ -93,9 +93,6 @@ public class Main extends JFrame implements ActionListener {
 		}
 		
 		GlobalScreen.addNativeKeyListener(new KeyListener());
-			
-			//System.out.println("The interval field text is: " + intervalFld.getText());
-			//System.out.println(KeyListener.getActiveKey());
 		
 	}
 
